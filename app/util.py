@@ -99,7 +99,7 @@ def generateMusic(q: str):
   # Generate wav music file
   print('Generating wave')
   music_path = os.path.join(current_dir, 'static/music/output.wav')
-  sound_font_path = os.path.join(current_dir, 'FluidR3_GM.sf2')
+  sound_font_path = os.path.join(current_dir, 'font.sf2')
   midi_to_audio(midi_path, music_path, sound_font_path=sound_font_path)
 
 
