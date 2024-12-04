@@ -1,0 +1,159 @@
+:root {
+  --emotion-color: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  background: black;
+  min-height: 100vh;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+}
+h2, h5 {
+  font-family: 'Lato', sans-serif;
+  color: white;
+}
+h2 {
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: white;
+}
+h5 {
+  font-weight: 400;
+  color: white;
+}
+
+.contain {
+  max-width: 1000px;
+  padding: 50px;
+  margin: 0 auto;
+}
+.card {
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(50px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 30px;
+  min-height: 350px;
+  margin-bottom: 20px;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url(https://thumbs.dreamstime.com/b/white-noise-background-effect-sound-effect-grain-distress-overlay-texture-your-design-grainy-gradient-background-145456887.jpg);;
+  background-size: 1000px;
+  opacity: 0.1; /* Adjust for the desired effect */
+  z-index: 1;
+  pointer-events: none; /* Allow clicks to pass through */
+}
+.card > .content {
+  z-index: 10;
+}
+
+.btn-outline-primary {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: rgba(87, 67, 112, 0.7); 
+  color: #ffffff; 
+  border-color: rgba(87, 67, 112, 1); 
+}
+
+.btn-check:checked + .btn-outline-primary {
+  background-color: var(--emotion-color); 
+  color: #fff !important;
+  border-color: var(--emotion-color);
+}
+
+.btn-check + .btn:hover {
+  border-color: white !important;
+  color: white;
+}
+.btn {
+  --bs-btn-font-size: 2rem !important;
+}
+.btn-success {
+  width: 200px;
+  background-color: white !important;
+  color: black !important;
+  font-weight: bold;
+  font-size: 1.2rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+}
+.btn-success:hover {
+  background-color: var(--emotion-color) !important;
+  color: white !important;
+}
+
+textarea {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px; 
+  color: #ffffff; 
+  padding: 15px; 
+  font-family: 'Poppins', sans-serif; 
+  font-size: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease; 
+  resize: none; 
+}
+textarea:focus {
+  background-color: rgba(255, 255, 255, 0.3); 
+  border-color: rgba(255, 255, 255, 0.5); 
+  outline: none; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.7); 
+  font-style: italic; 
+}
+label, p, span {
+  font-family: 'Poppins', sans-serif; 
+  font-weight: 400;
+}
+
+.bg {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+}
+.bg > * {
+  position: absolute;
+  aspect-ratio: 1 / 1;
+  border-radius: 100vmax;
+}
+.bg > .red {
+  width: 300px;
+  top: 93px;
+  left: calc(50vw - 500px);
+  background: linear-gradient(-45deg, red, orange);
+}
+.bg > .pink {
+  width: 500px;
+  top: 186px;
+  left: calc(50vw - 240px);
+  background: linear-gradient(-45deg, red, hotpink);
+}
+.bg > .purple {
+  width: 350px;
+  top: 140px;
+  left: calc(50vw + 100px);
+  background: linear-gradient(-45deg, purple, rgb(235, 105, 255));
+}
+.bg > .blue {
+  width: 200px;
+  top: 300px;
+  left: calc(50vw + 260px);
+  background: linear-gradient(-45deg, blue, purple);
+}

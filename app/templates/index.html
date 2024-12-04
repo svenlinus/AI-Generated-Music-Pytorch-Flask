@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Generator</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div class="bg">
+    <div class="purple"></div>
+    <div class="blue"></div>
+    <div class="red"></div>
+    <div class="pink"></div>
+  </div>
+  <div class="contain" style="min-height: 100vh;">
+    <div class="card text-center">
+      <div class="content">
+        <h2>Generate Music Personalized to Your Mood</h2>
+
+        <h5 class="mb-3">Choose an Emotion</h5>
+        <div class="btn-group mb-4" role="group" aria-label="Emotion Selector">
+          <form action="/generate" method="post">
+            <input type="radio" class="btn-check" name="q" id="Q1" value="Q1">
+            <label class="btn btn-outline-primary" for="Q1">Q1</label>
+            <input type="radio" class="btn-check" name="q" id="Q2" value="Q2">
+            <label class="btn btn-outline-primary" for="Q2">Q2</label>
+            <input type="radio" class="btn-check" name="q" id="Q3" value="Q3">
+            <label class="btn btn-outline-primary" for="Q3">Q3</label>
+            <input type="radio" class="btn-check" name="q" id="Q4" value="Q4">
+            <label class="btn btn-outline-primary" for="Q4">Q4</label>
+            <br><br>
+            <button type="submit" class="btn btn-success" id="generateButton">Generate</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="card text-center">
+      <audio controls autoplay>
+        <source src="{{ song_path }}?v={{ timestamp }}" type="audio/wav">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  </div>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  ></script>
+  <script>
+    const emotionOptions = document.getElementsByName('q');
+
+    const root = document.documentElement;
+    const emotionMap = {
+      'Q1': 'rgb(255, 85, 0)',
+      'Q2': 'rgb(225, 54, 157)',
+      'Q3': 'rgb(174, 54, 225)',
+      'Q4': 'rgb(80, 54, 225)',
+    }
+    root.style.setProperty('--emotion-color', 'rgba(255, 255, 255, 0.1)');
+
+    emotionOptions.forEach(option => {
+      option.addEventListener('change', () => {
+        if (option.checked) {
+          const val = option.value.trim();
+          root.style.setProperty('--emotion-color', emotionMap[val]);
+          console.log(val, emotionMap[val]);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
