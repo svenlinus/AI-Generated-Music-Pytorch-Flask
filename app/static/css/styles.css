@@ -52,6 +52,7 @@ h5 {
 }
 .card > .content {
   z-index: 10;
+  margin: 0 auto;
 }
 
 .btn-outline-primary {

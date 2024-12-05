@@ -1,3 +1,5 @@
+{% from "player.html" import player with context %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,18 +43,20 @@
       </div>
     </div>
     <div class="card text-center">
-      <audio controls autoplay>
-        <source src="{{ song_path }}?v={{ timestamp }}" type="audio/wav">
-        Your browser does not support the audio element.
-      </audio>
+      <div class="content">
+        {% if song_path | default(None) is not none %}
+          {{ player(song_path + '?v=' + timestamp) }}
+        {% endif %}
+      </div>
     </div>
   </div>
 
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-  ></script>
+  ></script>\
   <script>
     const emotionOptions = document.getElementsByName('q');
+    const quarter = "{{ quarter }}";
 
     const root = document.documentElement;
     const emotionMap = {
@@ -61,14 +65,15 @@
       'Q3': 'rgb(174, 54, 225)',
       'Q4': 'rgb(80, 54, 225)',
     }
-    root.style.setProperty('--emotion-color', 'rgba(255, 255, 255, 0.1)');
+    if (quarter) {
+      root.style.setProperty('--emotion-color', emotionMap[quarter]);
+    }
 
     emotionOptions.forEach(option => {
       option.addEventListener('change', () => {
         if (option.checked) {
           const val = option.value.trim();
           root.style.setProperty('--emotion-color', emotionMap[val]);
-          console.log(val, emotionMap[val]);
         }
       });
     });

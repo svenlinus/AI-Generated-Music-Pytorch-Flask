@@ -7,18 +7,18 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-  return render_template('index.html')
+  return render_template('index.html', song_path='', timestamp='', q='')
 
 @app.route('/generate', methods=['POST'])
 def play_song():
   q = request.form.get('q')
   initModel()
   generateMusic(q)
-  timestamp = datetime.now().timestamp()
+  timestamp = str(datetime.now().timestamp())
   song_path = 'static/music/output.wav'
   
   if song_path:
-    return render_template('index.html', song_path=song_path, timestamp=timestamp)
+    return render_template('index.html', song_path=song_path, timestamp=timestamp, quarter=q)
   else:
     return "No song selected or invalid option.", 400
 

@@ -1,0 +1,90 @@
+{% macro player(music) %}
+  <style>
+    .player {
+      display: flex;
+      flex-direction: row;
+    }
+    .play {
+      aspect-ratio: 1 / 1;
+      border-radius: 100vmax;
+      background-color: var(--emotion-color);
+      border: none;
+      box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+  </style>
+  <div class="player">
+    <button class="play" onclick="playMusic()" style="margin-right: 40px;">
+      <img id="play-icon" src="static/icons/play.png" width="50px" />
+    </button>
+    <canvas id="waveform" width="420" height="60"></canvas>
+  </div>
+  <script>
+    const audio = new Audio('{{music}}');
+    const canvas = document.getElementById('waveform');
+    const ctx = canvas.getContext('2d');
+    const icon = document.getElementById('play-icon');
+
+    let audioContext, analyser, sourceNode;
+    let playing = false;
+
+    function setupAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256; // Number of frequency bins
+        analyser.smoothingTimeConstant = 0.8; // Smooth frequency data
+
+        sourceNode = audioContext.createMediaElementSource(audio);
+        sourceNode.connect(analyser);
+        analyser.connect(audioContext.destination);
+      }
+    }
+
+    function visualize() {
+      const bufferLength = analyser.frequencyBinCount;
+      const frequencyData = new Uint8Array(bufferLength);
+      const padding = 6;
+      const s = 0.35;
+      const num = bufferLength * s;
+
+      function draw() {
+        analyser.getByteFrequencyData(frequencyData);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const barWidth = ((canvas.width - num * padding) / bufferLength) / s;
+
+        for (let i = 0; i < num-1; i++) {
+          const value = frequencyData[i];
+          const h = (value / 255 * canvas.height) * (Math.pow(i, 1.2) / num * 3);
+          const barHeight = Math.min(Math.max(h, barWidth), canvas.height);
+          const x = i * (barWidth + padding);
+          const y = canvas.height - barHeight - ((canvas.height - barHeight) / 2);
+
+          ctx.fillStyle = `white`;
+          ctx.beginPath();
+          ctx.roundRect(x, y, barWidth, barHeight, 2);
+          ctx.fill();
+        }
+
+        setTimeout(draw, 1000 / 16);
+      }
+      draw();
+    }
+
+    audio.addEventListener('ended', playMusic);
+
+    function playMusic() {
+      setupAudio();
+      if (playing) {
+        icon.src = 'static/icons/play.png';
+        audio.pause();
+      }
+      else {
+        icon.src = 'static/icons/pause.png';
+        audioContext.resume();
+        audio.play();
+        visualize();
+      }
+      playing = !playing;
+    }
+  </script>
+{% endmacro %}
