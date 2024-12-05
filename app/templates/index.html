@@ -12,6 +12,91 @@
   />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script>
+    const emotionMap = {
+      'Q1': 'rgb(255, 85, 0)',
+      'Q2': 'rgb(225, 54, 157)',
+      'Q3': 'rgb(174, 54, 225)',
+      'Q4': 'rgb(80, 54, 225)',
+    }
+
+    function initPlayer(music, element, quarter) {
+      console.log(element);
+      const audio = new Audio(music);
+      const canvas = element.querySelector('#waveform');
+      const ctx = canvas.getContext('2d');
+      const icon = element.querySelector('#play-icon');
+      const button = element.querySelector('.play');
+      let audioContext, analyser, sourceNode;
+      let playing = false;
+
+      const setupAudio = () => {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioContext.createAnalyser();
+          analyser.fftSize = 256; // Number of frequency bins
+          analyser.smoothingTimeConstant = 0.8; // Smooth frequency data
+  
+          sourceNode = audioContext.createMediaElementSource(audio);
+          sourceNode.connect(analyser);
+          analyser.connect(audioContext.destination);
+        }
+      }
+
+      const visualize = () => {
+        const bufferLength = analyser.frequencyBinCount;
+        const frequencyData = new Uint8Array(bufferLength);
+        const padding = 6;
+        const s = 0.35;
+        const num = bufferLength * s;
+        const w = 4;
+  
+        function draw() {
+          analyser.getByteFrequencyData(frequencyData);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+          const barWidth = ((canvas.width - num * padding) / bufferLength) / s;
+          for (let i = 0; i < num-1; i++) {
+            const value = frequencyData[i];
+            const h = (value / 255 * canvas.height) * (Math.pow(i, 1.25) / num * 3);
+            const barHeight = Math.min(Math.max(h, barWidth), canvas.height);
+            const x = i * (barWidth + padding);
+            const y = canvas.height - barHeight - ((canvas.height - barHeight) / 2);
+  
+            ctx.fillStyle = `white`;
+            ctx.beginPath();
+            ctx.roundRect(x, y, barWidth, barHeight, 2);
+            ctx.fill();
+          }
+  
+          setTimeout(draw, 1000 / 16);
+        }
+        draw();
+      }
+
+      const playMusic = () => {
+        setupAudio();
+        if (playing) {
+          icon.src = 'static/icons/play.png';
+          audio.pause();
+        }
+        else {
+          icon.src = 'static/icons/pause.png';
+          audioContext.resume();
+          audio.play();
+          visualize();
+        }
+        playing = !playing;
+      }
+
+      audio.addEventListener('ended', playMusic);
+      button.addEventListener('click', playMusic);
+
+      if (quarter) {
+        button.style.backgroundColor = emotionMap[quarter];
+      }
+    }
+  </script>
 </head>
 <body>
   <div class="bg">
@@ -26,7 +111,7 @@
         <h2>Generate Music Personalized to Your Mood</h2>
 
         <h5 class="mb-3">Choose an Emotion</h5>
-        <div class="btn-group mb-4" role="group" aria-label="Emotion Selector">
+        <div class="btn-group" role="group" aria-label="Emotion Selector">
           <form action="/generate" method="post">
             <input type="radio" class="btn-check" name="q" id="Q1" value="Q1">
             <label class="btn btn-outline-primary" for="Q1">Q1</label>
@@ -42,29 +127,33 @@
         </div>
       </div>
     </div>
-    <div class="card text-center">
+    {% if song_path | default(None) is not none and song_path != '' %}
+      <div class="card text-center">
+        <div class="content">
+            {{ player(song_path + '?v=' + timestamp, '0', '') }}
+          </div>
+        </div>
+    {% endif %}
+    <div class="card text-center" style="{{ 'margin-top: 200px' if song_path == '' }}">
       <div class="content">
-        {% if song_path | default(None) is not none %}
-          {{ player(song_path + '?v=' + timestamp) }}
-        {% endif %}
+        <h2>Favorites</h2>
+        {{ player('http://127.0.0.1:5000/static/music/new8.wav', '1', 'Q2') }}
+        {{ player('http://127.0.0.1:5000/static/music/Q1.wav', '2', 'Q1') }}
+        {{ player('http://127.0.0.1:5000/static/music/Q2.wav', '3', 'Q2') }}
+        {{ player('http://127.0.0.1:5000/static/music/Q3.wav', '4', 'Q3') }}
+        {{ player('http://127.0.0.1:5000/static/music/Q4.wav', '5', 'Q4') }}
       </div>
     </div>
   </div>
 
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-  ></script>\
+  ></script>
   <script>
     const emotionOptions = document.getElementsByName('q');
     const quarter = "{{ quarter }}";
 
     const root = document.documentElement;
-    const emotionMap = {
-      'Q1': 'rgb(255, 85, 0)',
-      'Q2': 'rgb(225, 54, 157)',
-      'Q3': 'rgb(174, 54, 225)',
-      'Q4': 'rgb(80, 54, 225)',
-    }
     if (quarter) {
       root.style.setProperty('--emotion-color', emotionMap[quarter]);
     }
