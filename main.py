@@ -26,4 +26,4 @@ def play_song():
   return render_template('index.html', song_path='', timestamp='', quarter='')
   
 if __name__ == '__main__':
-  app.run(debug=True)
+  app.run()
