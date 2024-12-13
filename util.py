@@ -20,9 +20,9 @@ def initModel():
     CVAE.instance = model
 
 def midi_to_audio(midi_file_path, audio_file_path, sound_font_path="font.sf2"):
-  current_dir = os.path.dirname(os.path.abspath(__file__))
-  fluidsynth_path = os.path.join(current_dir, 'fluidsynth')
-  subprocess.call([fluidsynth_path, '-ni', sound_font_path, midi_file_path, '-F', audio_file_path, '-r', '44100'])
+  # current_dir = os.path.dirname(os.path.abspath(__file__))
+  # fluidsynth_path = os.path.join(current_dir, 'fluidsynth')
+  subprocess.call(['fluidsynth', '-ni', sound_font_path, midi_file_path, '-F', audio_file_path, '-r', '44100'])
   print(f"Conversion complete: {audio_file_path}")
 
 def vector_to_midi(vector, bps=2, time_step=TIME_STEP, max_time=MAX_TIME, ):
