@@ -22,6 +22,7 @@ pillow==11.0.0
 pretty-midi==0.2.10
 pyparsing==3.2.0
 python-dateutil==2.9.0.post0
+scipy==1.14.1
 six==1.16.0
 sympy==1.13.3
 torch==2.2.2
