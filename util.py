@@ -1,9 +1,10 @@
-import subprocess
+from midi2audio import FluidSynth
 import pretty_midi
 import numpy as np
 import torch
 import os
 from cvae import CVAE
+from scipy.io.wavfile import write
 
 
 TIME_STEP = 1/16
@@ -11,18 +12,27 @@ MAX_TIME = 16
 TEMPO = 2 # beat/sec
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+def getPath(path):
+  current_dir = os.path.dirname(os.path.abspath(__file__))
+  return os.path.join(current_dir, path)
+
 def initModel():
   if CVAE.instance is None:
     model = CVAE().to(device)
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(current_dir, 'model.pt')
+    model_path = getPath('model.pt')
     model.load_state_dict(torch.load(model_path, map_location=device))
     CVAE.instance = model
 
-def midi_to_audio(midi_file_path, audio_file_path, sound_font_path="font.sf2"):
-  current_dir = os.path.dirname(os.path.abspath(__file__))
-  fluidsynth_path = os.path.join(current_dir, 'fluidsynth')
-  subprocess.call([fluidsynth_path, '-ni', sound_font_path, midi_file_path, '-F', audio_file_path, '-r', '44100'])
+def midi_to_audio_2(midi_file_path, audio_file_path, sample_rate=44100):
+  midi_data = pretty_midi.PrettyMIDI(midi_file_path)
+  audio_data = midi_data.synthesize(fs=sample_rate)
+  audio_data = np.int16(audio_data / np.max(np.abs(audio_data)) * 32767 * 0.4)
+  write(audio_file_path, sample_rate, audio_data)
+  print(f"Conversion complete: {audio_file_path}")
+
+def midi_to_audio(midi_file_path, audio_file_path, sound_font_path="FluidR3_GM.sf2"):
+  fs = FluidSynth(sound_font_path)
+  fs.midi_to_audio(midi_file_path, audio_file_path)
   print(f"Conversion complete: {audio_file_path}")
 
 def vector_to_midi(vector, bps=2, time_step=TIME_STEP, max_time=MAX_TIME, ):
@@ -93,13 +103,11 @@ def generateMusic(q: str):
   vec = vec / np.max(vec) * 127
   print(np.max(vec))
   midi = vector_to_midi(vec.flatten(), bps=tempo)
-  current_dir = os.path.dirname(os.path.abspath(__file__))
-  midi_path = os.path.join(current_dir, 'static/music/output.mid')
+  midi_path = getPath('static/music/output.mid')
   midi.write(midi_path)
   # Generate wav music file
   print('Generating wave')
-  music_path = os.path.join(current_dir, 'static/music/output.wav')
-  sound_font_path = os.path.join(current_dir, 'font.sf2')
-  midi_to_audio(midi_path, music_path, sound_font_path=sound_font_path)
-
-
+  music_path = getPath('static/music/output.wav')
+  sound_font_path = getPath('font.sf2')
+  midi_to_audio_2(midi_path, music_path)
+  # midi_to_audio(midi_path, music_path, sound_font_path=sound_font_path)
