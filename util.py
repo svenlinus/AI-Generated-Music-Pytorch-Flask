@@ -1,10 +1,9 @@
-from midi2audio import FluidSynth
+import subprocess
 import pretty_midi
 import numpy as np
 import torch
 import os
 from cvae import CVAE
-import matplotlib.pyplot as plt
 
 
 TIME_STEP = 1/16
@@ -20,9 +19,10 @@ def initModel():
     model.load_state_dict(torch.load(model_path, map_location=device))
     CVAE.instance = model
 
-def midi_to_audio(midi_file_path, audio_file_path, sound_font_path="FluidR3_GM.sf2"):
-  fs = FluidSynth(sound_font_path)
-  fs.midi_to_audio(midi_file_path, audio_file_path)
+def midi_to_audio(midi_file_path, audio_file_path, sound_font_path="font.sf2"):
+  current_dir = os.path.dirname(os.path.abspath(__file__))
+  fluidsynth_path = os.path.join(current_dir, 'fluidsynth')
+  subprocess.call([fluidsynth_path, '-ni', sound_font_path, midi_file_path, '-F', audio_file_path, '-r', '44100'])
   print(f"Conversion complete: {audio_file_path}")
 
 def vector_to_midi(vector, bps=2, time_step=TIME_STEP, max_time=MAX_TIME, ):
